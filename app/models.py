@@ -426,3 +426,12 @@ class Product(models.Model):
         self.price = product_data.get("price", "") or self.price
 
         self.save()
+
+
+class MedicalRecord(models.Model):
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
+    vet = models.ForeignKey(Vet, on_delete=models.CASCADE)
+    # creo una relacion muchos a muchos con la tabla de medicamentos, ya que un registro medico puede tener varios medicamentos
+    medicine = models.ManyToManyField(Medicine)
+    date = models.DateField()
+    diagnosis = models.CharField(max_length=300)
