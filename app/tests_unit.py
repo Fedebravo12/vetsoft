@@ -215,8 +215,8 @@ class ClientModelTest(TestCase):
         """
         Client.save_client(
             {
-                "name": "Juan Sebastian Veron",
-                "phone": "54221555232",
+                "name": "JORGE ESTEBAN ALBERTO JUAREZ Juan Sebastian Veron Estudiantes ",
+                "phone": "54312321312321943294239423",
                 "city": CityEnum.ENSENADA,
                 "email": "brujita75@vetsoft.com",
             },
