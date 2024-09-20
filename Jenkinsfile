@@ -25,14 +25,6 @@ pipeline {
                 sh '. .venv/bin/activate && python manage.py check'
             }
         }
-        stage('Run Server') {
-            steps {
-                // Ejecutar el servidor de Django para asegurarse que levanta correctamente
-                sh '. .venv/bin/activate && nohup python manage.py runserver &'
-                // Esperar un tiempo para asegurarse que el servidor sube correctamente
-                sh 'sleep 10'
-            }
-        }
         stage('Run Static Test') {
             steps {
                 // Ejecutar el análisis estático de código usando el entorno virtual
@@ -65,8 +57,8 @@ pipeline {
                         // Autenticarse en Azure CLI con el Principal de Servicio
                         sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID'
 
-                        // Desplegar la aplicación en Azure App Service
-                        sh 'az webapp up --name vetsoft-app --resource-group admsistemasinformacion2024 --sku B1 --runtime "PYTHON|3.12"'
+                        // Desplegar la aplicación Django en Azure App Service en la región correcta
+                        sh 'az webapp up --name vetsoft-app --resource-group admsistemasinformacion2024 --sku B1 --runtime "PYTHON|3.12" --location eastus2'
                     }
                 }
             }
@@ -74,11 +66,9 @@ pipeline {
     }
     post {
         success {
-            // Mensaje de éxito si todas las pruebas pasan
             echo 'Todos los test pasaron con éxito y la aplicación se desplegó en Azure!'
         }
         failure {
-            // Mensaje de error si alguna prueba falla
             echo 'Hubo fallos en los tests o en el despliegue. Por favor revisar los logs.'
         }
     }
