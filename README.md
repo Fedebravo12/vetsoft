@@ -64,4 +64,4 @@ La imagen Docker actual es `vetsoft-app:v1.1`.
 ` git push origin v1.1 `
 
 
-## hice una prueba para ver si anda en jenkins y hasta ahora anduvo dsadasdsad
+## hice una prueba para ver si anda en jenkins y hasta ahora anduvo prueba pull request
