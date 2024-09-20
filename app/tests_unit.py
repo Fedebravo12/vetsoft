@@ -50,7 +50,8 @@ class ClientModelTest(TestCase):
             },
         )
         clients = Client.objects.all()
-        self.assertEqual(len(clients), 0)
+        # rompo un test aproposito para que fallen los test
+        self.assertEqual(len(clients), 1)
 
 
     def test_can_update_client(self):
