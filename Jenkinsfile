@@ -1,7 +1,10 @@
 pipeline {
     agent any
     environment {
-        AZURE_CREDENTIALS = credentials('cc4d1339-92cb-4dde-af11-694937876080')  // El ID que configuraste en Jenkins
+        AZURE_CREDENTIALS = credentials('cc4d1339-92cb-4dde-af11-694937876080')  // Las credenciales de Azure que configuraste en Jenkins
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')  // Credenciales de Docker Hub
+        DOCKER_IMAGE = 'germansalinas1994/vetsoft-app'  // Nombre de la imagen en Docker Hub
+        DOCKER_TAG = 'latest'  // Etiqueta que siempre será latest
     }
     stages {
         stage('Checkout') {
@@ -42,38 +45,47 @@ pipeline {
                 sh '. .venv/bin/activate && coverage report --fail-under=90'
             }
         }
-        // stage('Package Application') {
-        //     steps {
-        //         // Empaquetar la aplicación en un archivo zip para desplegarla
-        //         sh 'zip -r app.zip .'
-        //     }
-        // }
-        // stage('Deploy to Azure') {
-        //     steps {
-        //         script {
-        //             withCredentials([azureServicePrincipal(
-        //                 credentialsId: 'cc4d1339-92cb-4dde-af11-694937876080',
-        //                 subscriptionIdVariable: 'AZURE_SUBSCRIPTION_ID',
-        //                 clientIdVariable: 'AZURE_CLIENT_ID',
-        //                 clientSecretVariable: 'AZURE_CLIENT_SECRET',
-        //                 tenantIdVariable: 'AZURE_TENANT_ID'
-        //             )]) {
-        //                 // Autenticarse en Azure CLI con el Principal de Servicio
-        //                 sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID'
-
-        //                 // Desplegar el archivo zip empaquetado
-        //                 sh 'az webapp deploy --resource-group admsistemasinformacion2024 --name vetsoft-app --src-path app.zip'
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Autenticarse en Docker Hub
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+                    }
+                    // Construir la imagen Docker
+                    sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
+                    // Subir la imagen a Docker Hub
+                    sh 'docker push $DOCKER_IMAGE:$DOCKER_TAG'
+                }
+            }
+        }
+        stage('Deploy to Azure') {
+            steps {
+                script {
+                    // Desplegar la imagen Docker en Azure App Service
+                    withCredentials([azureServicePrincipal(
+                        credentialsId: 'cc4d1339-92cb-4dde-af11-694937876080',
+                        subscriptionIdVariable: 'AZURE_SUBSCRIPTION_ID',
+                        clientIdVariable: 'AZURE_CLIENT_ID',
+                        clientSecretVariable: 'AZURE_CLIENT_SECRET',
+                        tenantIdVariable: 'AZURE_TENANT_ID'
+                    )]) {
+                        sh '''
+                        az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+                        az webapp config container set --name vetsoft-app --resource-group admsistemasinformacion2024 --docker-custom-image-name germansalinas1994/vetsoft-app:latest
+                        az webapp restart --name vetsoft-app --resource-group admsistemasinformacion2024
+                        '''
+                    }
+                }
+            }
+        }
     }
     post {
         success {
-            echo 'Todos los test pasaron con éxito y la aplicación se desplegó en Azure!'
+            echo 'Todos los tests pasaron con éxito, la imagen Docker se subió a Docker Hub y la aplicación se desplegó en Azure!'
         }
         failure {
-            echo 'Hubo fallos en los tests o en el despliegue. Por favor revisar los logs.'
+            echo 'Hubo fallos en los tests, el build o el despliegue. Por favor revisar los logs.'
         }
     }
 }
