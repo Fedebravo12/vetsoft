@@ -50,7 +50,7 @@ class ClientModelTest(TestCase):
             },
         )
         clients = Client.objects.all()
-        # rompo un test aproposito para que fallen los test
+        # rompo un test aproposito para que fallen los test, lo volvi a cambiar para qeu funcione
         self.assertEqual(len(clients), 0)
 
 
