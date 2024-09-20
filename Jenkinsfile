@@ -8,7 +8,7 @@ pipeline {
         }
         stage('Install Dependencies') {
             steps {
-                sh 'pip3 install -r requirements-dev.txt'
+                sh 'python3 -m pip install -r requirements-dev.txt'
             }
         }
         stage('Run Tests') {
