@@ -7,12 +7,26 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/germansalinas1994/vetsoft'
             }
         }
-        stage('Set Up Python Virtual Environment') {
+        stage('Set up Python Virtual Environment') {
             steps {
                 // Crear un entorno virtual en el directorio .venv
                 sh 'python3 -m venv .venv'
                 // Activar el entorno virtual e instalar las dependencias
                 sh '. .venv/bin/activate && pip install -r requirements.txt'
+            }
+        }
+          stage('Build and Check') {
+            steps {
+                // Verificar si la aplicación Django tiene errores usando el comando check
+                sh '. .venv/bin/activate && python manage.py check'
+            }
+        }
+        stage('Run Server') {
+            steps {
+                // Ejecutar el servidor de Django para asegurarse que levanta correctamente
+                sh '. .venv/bin/activate && nohup python manage.py runserver &'
+                // Esperar un tiempo para asegurarse que el servidor sube correctamente
+                sh 'sleep 10'
             }
         }
         stage('Run Static Test') {
@@ -38,11 +52,11 @@ pipeline {
     post {
         success {
             // Mensaje de éxito si todas las pruebas pasan
-            echo 'All tests passed successfully!'
+            echo 'Todos los test pasaron con éxito!'
         }
         failure {
             // Mensaje de error si alguna prueba falla
-            echo 'Some tests failed. Please check the logs.'
+            echo 'Hay falla en los test.'
         }
     }
 }
