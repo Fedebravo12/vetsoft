@@ -15,6 +15,12 @@ pipeline {
                 sh '. .venv/bin/activate && pip install -r requirements.txt'
             }
         }
+        stage('Install Playwright Browsers') {
+            steps {
+                // Instalar los navegadores que Playwright necesita
+                sh '. .venv/bin/activate && python -m playwright install --with-deps'
+            }
+        }
         stage('Run Static Test') {
             steps {
                 // Ejecutar el análisis estático de código usando el entorno virtual
@@ -35,7 +41,7 @@ pipeline {
         }
         stage('Run E2E Tests') {
             steps {
-                // Ejecutar pruebas end-to-end
+                // Ejecutar pruebas end-to-end usando Playwright
                 sh '. .venv/bin/activate && python manage.py test functional_tests'
             }
         }
