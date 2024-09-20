@@ -52,10 +52,10 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
                     }
-                    // Construir la imagen Docker
-                    sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
-                    // Subir la imagen a Docker Hub
-                    sh 'docker push $DOCKER_IMAGE:$DOCKER_TAG'
+                    // // Construir la imagen Docker
+                    // sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
+                    // // Subir la imagen a Docker Hub
+                    // sh 'docker push $DOCKER_IMAGE:$DOCKER_TAG'
                 }
             }
         }
