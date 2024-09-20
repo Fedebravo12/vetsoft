@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    environment {
+        // ID de las credenciales de Azure configuradas en Jenkins
+        AZURE_CREDENTIALS = credentials('cc4d1339-92cb-4dde-af11-694937876080')  // El ID que configuraste en Jenkins
+    }
     stages {
         stage('Checkout') {
             steps {
@@ -15,7 +19,7 @@ pipeline {
                 sh '. .venv/bin/activate && pip install -r requirements.txt'
             }
         }
-          stage('Build and Check') {
+        stage('Build and Check') {
             steps {
                 // Verificar si la aplicación Django tiene errores usando el comando check
                 sh '. .venv/bin/activate && python manage.py check'
@@ -47,16 +51,35 @@ pipeline {
                 sh '. .venv/bin/activate && coverage report --fail-under=90'
             }
         }
+        stage('Deploy to Azure') {
+            steps {
+                script {
+                    // Autenticarse en Azure usando las credenciales configuradas en Jenkins
+                    withCredentials([azureServicePrincipal(
+                        credentialsId: 'cc4d1339-92cb-4dde-af11-694937876080',  // El ID de tus credenciales en Jenkins
+                        subscriptionIdVariable: 'AZURE_SUBSCRIPTION_ID',
+                        clientIdVariable: 'AZURE_CLIENT_ID',
+                        clientSecretVariable: 'AZURE_CLIENT_SECRET',
+                        tenantIdVariable: 'AZURE_TENANT_ID'
+                    )]) {
+                        // Autenticarse en Azure CLI con el Principal de Servicio
+                        sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID'
 
+                        // Desplegar la aplicación en Azure App Service
+                        sh 'az webapp up --name vetsoft-app --resource-group admsistemasinformacion2024 --sku B1 --runtime "PYTHON|3.12"'
+                    }
+                }
+            }
+        }
     }
     post {
         success {
             // Mensaje de éxito si todas las pruebas pasan
-            echo 'Todos los test pasaron con éxito!'
+            echo 'Todos los test pasaron con éxito y la aplicación se desplegó en Azure!'
         }
         failure {
             // Mensaje de error si alguna prueba falla
-            echo 'Hay falla en los test.'
+            echo 'Hubo fallos en los tests o en el despliegue. Por favor revisar los logs.'
         }
     }
 }
