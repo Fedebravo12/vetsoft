@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.10'  // Usar la imagen de Python 3.10 con Docker
-            args '-u root'       // Para asegurarse de tener permisos para instalar dependencias
-        }
-    }
+
     stages {
         stage('Checkout') {
             steps {
