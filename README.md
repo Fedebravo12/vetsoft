@@ -62,3 +62,6 @@ La imagen Docker actual es `vetsoft-app:v1.1`.
 
 ` git tag -a v1.1 -m "Version 1.1" `
 ` git push origin v1.1 `
+
+
+## hice una prueba para ver si anda en jenkins y hasta ahora anduvo prueba pull request con fede y credenciales armo otroooooo

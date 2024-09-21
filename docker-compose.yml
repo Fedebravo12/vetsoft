@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  vetsoft:
+    image: germansalinas1994/vetsoft-app:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"  # Mapea el puerto 8000 del contenedor al puerto 8000 de tu host
+    volumes:
+      - /path/to/db.sqlite3:/app/db.sqlite3  # Asegúrate de que este sea el path correcto de tu archivo de base de datos en el servidor
+    environment:
+      - DJANGO_SETTINGS_MODULE=vetsoft.settings
+    command: python manage.py runserver 0.0.0.0:8000  # o cambia a uwsgi o daphne si usas una de esas opciones
