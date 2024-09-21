@@ -1,4 +1,3 @@
-
 version: '3.8'
 
 services:
@@ -10,7 +9,7 @@ services:
     ports:
       - "8000:8000"  # Mapea el puerto 8000 del contenedor al puerto 8000 de tu host
     volumes:
-      - //Users/germansalinas/Proyectos facultad/Proyecto Jenkins/vetsoft/db.sqlite3:/app/db.sqlite3  # Mapea el archivo de la base de datos
+      - /path/to/db.sqlite3:/app/db.sqlite3  # Asegúrate de que este sea el path correcto de tu archivo de base de datos en el servidor
     environment:
       - DJANGO_SETTINGS_MODULE=vetsoft.settings
-    command: gunicorn --bind 0.0.0.0:8000 --workers 2 vetsoft.wsgi
+    command: python manage.py runserver 0.0.0.0:8000  # o cambia a uwsgi o daphne si usas una de esas opciones
