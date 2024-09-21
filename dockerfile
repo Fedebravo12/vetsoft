@@ -1,5 +1,5 @@
 # Fase de construcción para instalar las dependencias
-FROM python:3.11-slim AS builder
+FROM python:3.11-slim as builder
 
 WORKDIR /app
 
