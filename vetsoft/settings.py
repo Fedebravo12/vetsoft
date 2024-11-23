@@ -30,14 +30,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #DEBUG = os.getenv("DEBUG")
 #ALLOWED_HOSTS = []
 
-DEBUG = os.getenv("DEBUG")
+# DEBUG = os.getenv("DEBUG")
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost',
-    '127.0.0.1',
-    "vetsoft-app-v1-1-1.onrender.com"]
+
+ALLOWED_HOSTS = ['57.154.224.30', 'localhost', '127.0.0.1']
+
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://vetsoft-app-v1-1.onrender.com',
+    'http://57.154.224.30',
 ]
 
 if DEBUG:
